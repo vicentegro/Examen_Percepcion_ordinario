@@ -1,0 +1,37 @@
+Population poblacion;
+int maxScore=0;
+int individuals=500;
+String phrase = "1579317/1702384";
+int DNASize = phrase.length();
+int generationNumber=0;
+boolean endOfAlgorithm = false;
+void setup() {
+  size(900, 500);
+  //Generacion 0
+  poblacion = new Population(individuals,DNASize);
+  background(0);
+  println("Generation-zero");
+  poblacion.showTextFit(phrase);
+}
+
+void draw() {
+  if (!endOfAlgorithm){
+  generationNumber++;
+  println("Generation " + str(generationNumber));
+  background(0);
+  maxScore=poblacion.nextGen(phrase, generationNumber);
+  poblacion.showTextFit(phrase);
+  //poblacion.showText();
+  if(maxScore==DNASize ){ 
+  println("End of Algorithm at generation Number " + str(generationNumber));
+  println(poblacion.chosenOneTale);
+  stop();
+  }
+  }
+ 
+}
+
+void stop() {
+  //exit();
+  endOfAlgorithm=true;
+}
