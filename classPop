@@ -1,0 +1,137 @@
+class Population {
+  DNA [] myPop;
+  int ind;
+  int genes;
+  int pressure = 3;
+  int maxScore;
+  float mutationChance = 0.20;
+  int numberOfMutations=1;
+  String theChosenOne="";
+  String chosenOneTale="";
+  Population(int i_, int g_) {
+    ind = i_;
+    genes = g_;
+    myPop = new DNA[ind];
+    for (int i = 0; i < ind; i++) {
+      myPop[i] = new DNA(genes);
+    }
+  }
+  void showText() {
+    for (int i = 0; i < 500/32; i++) {
+      //myPop[i].showData();
+      myPop[i].showText((32*(i+1)));
+    }
+  }
+  
+  void showFitness(String target){
+    for (int i = 0; i < ind; i++) {
+      println(myPop[i].calcFitness(target));
+    }
+  }
+  
+  void showTextFit(String target) {
+    for (int i = 0; i < ind; i++) {
+      print(myPop[i].calcFitness(target));
+      print(", ");
+      myPop[i].showData();
+      myPop[i].showText((32*(i+1)));
+    }
+  }
+ 
+  int nextGen(String target, int generationNumber){
+    //Sort Population by its fitness
+    String sortedPop [] = new String [ind];
+    
+    //Crea un array de strings concatenando el adn con su fitness al inicio para poder hacer un sorting
+    for (int i = 0; i <ind; i++) { 
+      String fitness = str(myPop[i].calcFitness(target));
+      if(fitness.length()==1){
+      fitness = "0" + fitness;
+      }
+      String adnStr = myPop[i].getADNstring();
+      String sorted = fitness + "," + adnStr;
+      sortedPop[i] =  sorted; 
+      int newScore = parseInt(fitness);
+      if (newScore>maxScore){
+      maxScore = newScore;
+      if(maxScore==genes){
+      theChosenOne=sortedPop[i];
+      chosenOneTale="Hail the Chosen One : " + theChosenOne + "    Individual's Index = " + str(i) + "   Generation Number = " + str(generationNumber);
+      }
+    }
+      
+     }
+      sortedPop = sort(sortedPop);
+      
+    
+    //Ya que estan acomodados los elementos de menor a mayor fitness, removemos el numero y la coma que se fueron agregados
+    for (int i = 0; i <ind; i++){
+     //if(sortedPop[i].substring(1)== ","){ //Si el fitness es de un digito "9,ADNstring"
+        sortedPop[i] = sortedPop[i].substring(3); 
+     //}
+     //else{  //si el fitness es de dos digitos "19,ADNstring"
+     //   sortedPop[i] = sortedPop[i].substring(2);
+    //}
+    }
+   
+    String parents[] = new String [pressure];
+    //Selection of the fittest
+    //println("Selection of the fittest");
+    int j =0;
+    for (int i = ind-pressure; i<ind; i++){
+      parents[j] = sortedPop[i];
+     //println(parents[j]);
+      j++;
+    }
+      
+    //Reproduction
+    for(int i = 0; i< ind-pressure; i++){
+    int randomIndex= int(random(0,(genes))); //escoge indice al azar
+    int randomSample = int(random(0,(pressure))); // escoge padra al azar
+    int randomSample2 = int(random(0,(pressure)));
+    if (randomSample==randomSample2){
+      randomSample2 = int(random(0,(pressure)));
+    }
+    //char [] ADNtochar= sortedPop[i].toCharArray();//convierte un adn en array de caracteres para ser iterados
+    char [] ADNtochar= parents[randomSample2].toCharArray();
+    char [] sample = parents[randomSample].toCharArray();//convierte adn de padre a array de caracteres 
+    
+    for(int k = randomIndex; k<genes; k++){
+      ADNtochar[k]=sample[k]; //intercambia caracteres
+    }
+    sortedPop[i] = new String (ADNtochar);
+    }
+    //println("Next Generation");
+    //for(int i = 0; i<ind; i++){
+    //   println(sortedPop[i]);
+     //}
+     //MUTATION
+     for(int x = 0 ; x<ind-pressure; x++){
+       float mutation = random(0,1);
+       if(mutation<=mutationChance){
+         for(int z=0; z<numberOfMutations; z++){
+         Base mutatedGene = new Base();
+         int randomLetter = int(random(0,genes));
+         char[] mutatedBreed = sortedPop[x].toCharArray();
+         mutatedBreed[randomLetter]= mutatedGene.letra;
+       sortedPop[x] = new String(mutatedBreed);
+         }
+     }
+     }
+     //Print new Generation
+     //println("New Generation with Mutation");
+     //for(int i = 0; i<ind; i++){
+     //println(sortedPop[i]);
+     //}
+     
+    //Cambiar de sorted a myPop
+    for(int i=0; i<ind;i++){
+     char[] geneticInfo = sortedPop[i].toCharArray(); 
+      for(int k = 0; k<genes; k++){  
+        myPop[i].myGenes[k].letra = geneticInfo[k];
+      }
+     }
+    
+  return maxScore;
+  }//newGen end
+}//class end
